@@ -1,0 +1,6 @@
+{
+  "name": "Dịch vụ Thiết Kế Website Chuyên Nghiệp",
+  "description": "Website landing page giới thiệu dịch vụ thiết kế website cao cấp, hiện đại, tối ưu SEO dành cho cá nhân, cửa hàng và tuyển tập các mẫu website chuyên nghiệp.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
