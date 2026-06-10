@@ -137,7 +137,10 @@ export default function App() {
   }
 
   return (
-    <div className="bg-brand-dark min-h-screen text-slate-100 font-sans selection:bg-brand-cyan/30 selection:text-white">
+    <div className="bg-brand-dark min-h-screen text-slate-100 font-sans selection:bg-brand-cyan/30 selection:text-white relative overflow-hidden">
+      
+      {/* Interactive Galaxy Floating Starry Layer */}
+      <div className="galaxy-layer" />
       
       {/* Sticky Header Nav */}
       <Header 
@@ -255,33 +258,7 @@ export default function App() {
         </motion.div>
       </AnimatePresence>
 
-      {/* Local Admin Database Access Button (For Demo & Verification) */}
-      <div className="py-8 bg-brand-dark/95 text-center border-t border-white/5 relative z-20">
-        <p className="text-xs text-slate-500 mb-3.5">
-          (Khu vực thử nghiệm và truy cập nhanh hệ thống bán hàng &amp; tư vấn)
-        </p>
-        
-        <div className="flex flex-wrap items-center justify-center gap-3">
-          <button
-            onClick={() => {
-              fetchSubmissions();
-              setShowAdminPanel(true);
-            }}
-            className="inline-flex items-center gap-2 px-4.5 py-2.5 rounded-xl bg-slate-900 border border-white/10 hover:border-brand-purple/40 text-xs font-mono font-medium text-slate-400 hover:text-white transition-all cursor-pointer shadow-md"
-          >
-            <Inbox size={14} className="text-brand-purple" />
-            Hòm thư nhanh ({allSubmissions.length})
-          </button>
 
-          <button
-            onClick={() => navigateTo("/admin")}
-            className="inline-flex items-center gap-2 px-4.5 py-2.5 rounded-xl bg-gradient-to-tr from-[#06b6d4] to-[#8b5cf6] border border-white/10 text-slate-950 hover:text-white transition-all cursor-pointer shadow-md font-bold text-xs font-mono"
-          >
-            <Inbox size={14} />
-            Đến Trang Admin Quản Trị (/admin)
-          </button>
-        </div>
-      </div>
 
       {/* Footer credits and local coordinates */}
       <Footer 

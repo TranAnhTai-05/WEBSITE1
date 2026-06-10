@@ -446,12 +446,6 @@ export default function AdminPanel({ onBackToLanding }: AdminPanelProps) {
                 </div>
               )}
 
-              <div className="p-3.5 bg-white/5 border border-white/5 rounded-xl text-[11px] text-slate-400 space-y-1">
-                <p className="font-semibold text-slate-300 font-mono">🔑 THÔNG TIN TRUY CẬP DEMO:</p>
-                <p>• Tài khoản: <span className="text-amber-400 font-bold">admin</span></p>
-                <p>• Mật khẩu: <span className="text-amber-400 font-bold">123456</span></p>
-              </div>
-
               <div>
                 <button
                   type="submit"
