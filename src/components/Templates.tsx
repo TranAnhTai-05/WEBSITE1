@@ -1,25 +1,33 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { templatesData } from "../data";
-import { ArrowUpRight, Grid, LayoutList, Heart, Sparkles } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
+import { TemplateItem } from "../types";
 
 interface TemplatesProps {
   onSelectTemplate: (templateTitle: string) => void;
+  templates?: TemplateItem[];
 }
 
-export default function Templates({ onSelectTemplate }: TemplatesProps) {
+export default function Templates({ onSelectTemplate, templates }: TemplatesProps) {
   const [filter, setFilter] = useState<string>("all");
 
   const filterOptions = [
     { id: "all", label: "Tất cả mẫu" },
     { id: "enterprise", label: "Doanh nghiệp" },
     { id: "ecommerce", label: "Bán hàng online" },
-    { id: "landing", label: "Landing Page" },
-    { id: "personal", label: "Cá nhân / Đào tạo" }
+    { id: "booking", label: "Lập lịch/Spa/Coffee" },
+    { id: "personal", label: "Cá nhân / Đào tạo" },
+    { id: "landing", label: "Landing Page" }
   ];
 
-  // Helper matching state
-  const filteredTemplates = templatesData.filter((t) => {
+  const activeTemplates = templates && templates.length > 0 ? templates : templatesData;
+
+  // Render templates that are enabled or default active
+  const filteredTemplates = activeTemplates.filter((t) => {
+    // Only render active templates
+    if (t.isActive === false) return false;
+
     if (filter === "all") return true;
     if (filter === "personal") return t.category === "personal" || t.category === "booking";
     return t.category === filter;
@@ -45,7 +53,7 @@ export default function Templates({ onSelectTemplate }: TemplatesProps) {
           </p>
         </div>
 
-        {/* Dynamic Category Filters Swiper/Row */}
+        {/* Dynamic Category Filters Row */}
         <div className="flex flex-wrap justify-center items-center gap-2 mb-12">
           {filterOptions.map((opt) => (
             <button
@@ -114,7 +122,7 @@ export default function Templates({ onSelectTemplate }: TemplatesProps) {
                   {/* Card metadata body */}
                   <div className="p-5">
                     <span className="text-[10px] font-mono font-bold uppercase text-brand-purple bg-brand-purple/10 px-2.5 py-0.5 rounded border border-brand-purple/20">
-                      {tp.categoryLabel}
+                      {tp.categoryLabel || tp.category}
                     </span>
                     <h3 className="text-sm sm:text-base font-display font-extrabold text-white mt-3 group-hover:text-brand-cyan transition-colors line-clamp-2">
                       {tp.title}

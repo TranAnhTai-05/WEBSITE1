@@ -3,11 +3,15 @@ import { servicesData } from "../data";
 import LucideIcon from "./LucideIcon";
 import { ChevronRight } from "lucide-react";
 
+import { ServiceItem } from "../types";
+
 interface ServicesProps {
   onSelectService: (serviceTitle: string) => void;
+  services?: ServiceItem[];
 }
 
-export default function Services({ onSelectService }: ServicesProps) {
+export default function Services({ onSelectService, services }: ServicesProps) {
+  const activeServices = services && services.length > 0 ? services : servicesData;
   // Stagger animation container
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -53,7 +57,7 @@ export default function Services({ onSelectService }: ServicesProps) {
           viewport={{ once: true, margin: "-100px" }}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
         >
-          {servicesData.map((service, index) => (
+          {activeServices.map((service, index) => (
             <motion.div
               key={service.id}
               variants={itemVariants}

@@ -1,12 +1,14 @@
 import { motion } from "motion/react";
 import { ArrowRight, Laptop, Sparkles, Code2, Globe, TrendingUp, CheckCircle, Database } from "lucide-react";
+import { HomeContent } from "../types";
 
 interface HeroProps {
   onQuoteClick: () => void;
   onExploreTemplatesClick: () => void;
+  homeContent?: HomeContent | null;
 }
 
-export default function Hero({ onQuoteClick, onExploreTemplatesClick }: HeroProps) {
+export default function Hero({ onQuoteClick, onExploreTemplatesClick, homeContent }: HeroProps) {
   const supportedPlatforms = [
     { name: "WordPress", color: "text-sky-400 border-sky-400/20 bg-sky-950/20" },
     { name: "Google Sites", color: "text-amber-400 border-amber-400/20 bg-amber-950/20" },
@@ -17,6 +19,12 @@ export default function Hero({ onQuoteClick, onExploreTemplatesClick }: HeroProp
     { name: "Webflow", color: "text-cyan-400 border-cyan-400/20 bg-cyan-950/20" }
   ];
 
+  // Load from local storage values or fallbacks
+  const titleText = homeContent?.heroTitle || "Thiết kế website Xịn xò & Cao cấp cho doanh nghiệp";
+  const subtitleText = homeContent?.heroSubtitle || "Bạn cần website? Tôi giúp bạn sở hữu trang web đẹp, nhanh, chuẩn SEO và dễ quản lý trên đa nền tảng: WordPress, Shopify, LadiPage, Webflow, Google Sites...";
+  const primaryCtaText = homeContent?.heroPrimaryCta || "Tư vấn miễn phí";
+  const secondaryCtaText = homeContent?.heroSecondaryCta || "Khám phá mẫu web";
+
   return (
     <section 
       id="home" 
@@ -26,7 +34,7 @@ export default function Hero({ onQuoteClick, onExploreTemplatesClick }: HeroProp
       <div className="absolute top-1/4 right-1/4 w-[350px] sm:w-[500px] h-[350px] sm:h-[500px] bg-brand-cyan/20 rounded-full filter blur-[120px] animate-pulse-glow" />
       <div className="absolute bottom-1/4 left-1/4 w-[350px] sm:w-[500px] h-[350px] sm:h-[500px] bg-indigo-500/10 rounded-full filter blur-[120px] animate-pulse-glow" style={{ animationDelay: "3s" }} />
 
-      {/* Floating abstract decorative icons (Anti-AI-slop layout - clean vector shapes) */}
+      {/* Floating abstract decorative icons space */}
       <div className="hidden lg:block absolute top-[18%] right-[48%] h-8 w-8 text-brand-purple/40 animate-float-slow">
         <Sparkles size={32} />
       </div>
@@ -58,7 +66,7 @@ export default function Hero({ onQuoteClick, onExploreTemplatesClick }: HeroProp
               transition={{ duration: 0.6, delay: 0.1 }}
               className="text-4xl sm:text-5xl lg:text-6.5xl font-display font-extrabold tracking-tight text-white leading-tight"
             >
-              Thiết kế website <span className="gradient-text font-extrabold">Xịn xò &amp; Cao cấp</span> cho doanh nghiệp
+              {titleText}
             </motion.h1>
 
             <motion.p
@@ -67,7 +75,7 @@ export default function Hero({ onQuoteClick, onExploreTemplatesClick }: HeroProp
               transition={{ duration: 0.6, delay: 0.2 }}
               className="mt-6 text-base sm:text-lg text-slate-400 leading-relaxed max-w-xl"
             >
-              Bạn cần website? Tôi giúp bạn sở hữu trang web đẹp, nhanh, chuẩn SEO và dễ quản lý trên đa nền tảng: WordPress, Shopify, LadiPage, Webflow...
+              {subtitleText}
             </motion.p>
 
             {/* CTA action buttons */}
@@ -79,16 +87,16 @@ export default function Hero({ onQuoteClick, onExploreTemplatesClick }: HeroProp
             >
               <button
                 onClick={onQuoteClick}
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-2xl glow-button transition-all duration-300 transform hover:-translate-y-0.5 active:scale-95 cursor-pointer group"
+                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-2xl glow-button transition-all duration-300 transform hover:-translate-y-0.5 active:scale-95 cursor-pointer group animate-pulse"
               >
-                Tư vấn miễn phí
+                {primaryCtaText}
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
               </button>
               <button
                 onClick={onExploreTemplatesClick}
                 className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-slate-950 font-bold rounded-2xl hover:bg-cyan-400 hover:text-slate-950 transition-all duration-200 cursor-pointer"
               >
-                Khám phá mẫu web
+                {secondaryCtaText}
               </button>
             </motion.div>
 
@@ -180,7 +188,7 @@ export default function Hero({ onQuoteClick, onExploreTemplatesClick }: HeroProp
               </div>
             </div>
 
-            {/* Flying Widget Card 1: Beautiful interactive review stat */}
+            {/* Flying Widget Card 1 */}
             <div className="absolute top-[-5px] right-[-10px] sm:right-6 bg-slate-950/90 border border-white/10 rounded-xl p-3 shadow-xl backdrop-blur-md w-36 animate-float-delayed">
               <div className="flex items-center gap-2">
                 <div className="h-7 w-7 rounded-lg bg-brand-cyan/20 flex items-center justify-center text-brand-cyan">
@@ -193,10 +201,10 @@ export default function Hero({ onQuoteClick, onExploreTemplatesClick }: HeroProp
               </div>
             </div>
 
-            {/* Flying Widget Card 2: Zalo Mockup Notification */}
+            {/* Flying Widget Card 2 */}
             <div className="absolute bottom-[35px] left-[-15px] sm:left-4 bg-slate-950/90 border border-emerald-500/20 rounded-xl p-3 shadow-xl backdrop-blur-md w-40 animate-float">
               <div className="flex items-center gap-2.5">
-                <div className="h-7 w-7 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400-500 text-emerald-400">
+                <div className="h-7 w-7 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 text-emerald-400">
                   <CheckCircle className="w-4 h-4" />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -207,7 +215,7 @@ export default function Hero({ onQuoteClick, onExploreTemplatesClick }: HeroProp
               </div>
             </div>
 
-            {/* Flying Widget Card 3: Database SEO indicator */}
+            {/* Flying Widget Card 3 */}
             <div className="absolute top-1/2 right-[-20px] sm:right-0 bg-slate-950/90 border border-brand-purple/20 rounded-xl p-2.5 shadow-xl backdrop-blur-md w-32 animate-float-slow">
               <div className="flex items-center gap-2">
                 <div className="h-6 w-6 rounded-lg bg-brand-purple/20 flex items-center justify-center text-brand-purple">

@@ -12,55 +12,94 @@ import FAQ from "./components/FAQ";
 import ContactForm from "./components/ContactForm";
 import FloatingWidgets from "./components/FloatingWidgets";
 import Footer from "./components/Footer";
-import { ContactSubmission } from "./types";
+import AdminPanel from "./components/AdminPanel";
+import { ContactSubmission, ServiceItem, PriceTier, TemplateItem, HomeContent, ContactSettings } from "./types";
+import { 
+  getStoredSubmissions, 
+  getStoredServices, 
+  getStoredPricing, 
+  getStoredTemplates, 
+  getStoredHomeContent, 
+  getStoredContactSettings 
+} from "./utils/localStorageState";
 import { Inbox, Trash2, CheckCircle2, X } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
 export default function App() {
+  const [currentPath, setCurrentPath] = useState<string>(window.location.pathname);
+  const [activeTab, setActiveTab] = useState<string>("home");
   const [prefilledNeed, setPrefilledNeed] = useState<string>("");
   const [showAdminPanel, setShowAdminPanel] = useState<boolean>(false);
   const [allSubmissions, setAllSubmissions] = useState<ContactSubmission[]>([]);
 
-  // Function to smoothly handle focus scrolling to the contact form section
-  const handleSelectNeed = (needTitle: string) => {
-    setPrefilledNeed(needTitle);
-    const element = document.getElementById("contact");
-    if (element) {
-      const headerOffset = 90;
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+  // Persistent States configured dynamically via /admin
+  const [services, setServices] = useState<ServiceItem[]>([]);
+  const [pricing, setPricing] = useState<PriceTier[]>([]);
+  const [templates, setTemplates] = useState<TemplateItem[]>([]);
+  const [homeContent, setHomeContent] = useState<HomeContent | null>(null);
+  const [contactSettings, setContactSettings] = useState<ContactSettings | null>(null);
 
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: "smooth"
-      });
-    }
+  // Synchronize dynamic states from Local Storage
+  const reloadData = () => {
+    setServices(getStoredServices());
+    setPricing(getStoredPricing());
+    setTemplates(getStoredTemplates());
+    setHomeContent(getStoredHomeContent());
+    setContactSettings(getStoredContactSettings());
+    fetchSubmissions();
   };
 
-  const handleFreeConsultClick = () => {
-    handleSelectNeed("Tư vấn tổng quan/Chưa chọn gói");
-  };
+  // Sync back-button or URL pathname alterations
+  useEffect(() => {
+    const handleLocationChange = () => {
+      setCurrentPath(window.location.pathname);
+    };
+    window.addEventListener("popstate", handleLocationChange);
+    return () => {
+      window.removeEventListener("popstate", handleLocationChange);
+    };
+  }, []);
 
-  // Fetch admin list of leads
+  // Fetch active admin submissions list for indicator metrics
   const fetchSubmissions = () => {
     try {
-      const stored = localStorage.getItem("wesign_contact_submissions");
-      if (stored) {
-        setAllSubmissions(JSON.parse(stored));
-      } else {
-        setAllSubmissions([]);
-      }
+      setAllSubmissions(getStoredSubmissions());
     } catch (e) {
       console.error(e);
     }
   };
 
+  // Listen to cross-tab storage changes & run on path switch
   useEffect(() => {
-    fetchSubmissions();
-    // Watch localStorage changes
-    const interval = setInterval(fetchSubmissions, 2000);
-    return () => clearInterval(interval);
-  }, []);
+    reloadData();
+    window.addEventListener("storage", reloadData);
+    return () => window.removeEventListener("storage", reloadData);
+  }, [currentPath]);
+
+  // Handle direct navigation routing helper
+  const navigateTo = (path: string) => {
+    window.history.pushState({}, "", path);
+    setCurrentPath(path);
+  };
+
+  // Route back directly to "/" landing on clicking back link
+  const handleBackToLanding = () => {
+    navigateTo("/");
+  };
+
+  // Function to switch tab to contact and prefill form
+  const handleSelectNeed = (needTitle: string) => {
+    setPrefilledNeed(needTitle);
+    setActiveTab("contact");
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  };
+
+  const handleFreeConsultClick = () => {
+    handleSelectNeed("Tư vấn tổng quan/Chưa chọn gói");
+  };
 
   const handleToggleStatus = (id: string) => {
     try {
@@ -88,70 +127,171 @@ export default function App() {
     }
   };
 
+  // RENDER MASTER ROUTING: Full administration page matching /admin URL exactly
+  if (currentPath === "/admin") {
+    return (
+      <div className="bg-slate-950 min-h-screen text-slate-100 font-sans selection:bg-brand-cyan/20 selection:text-white">
+        <AdminPanel onBackToLanding={handleBackToLanding} />
+      </div>
+    );
+  }
+
   return (
     <div className="bg-brand-dark min-h-screen text-slate-100 font-sans selection:bg-brand-cyan/30 selection:text-white">
       
       {/* Sticky Header Nav */}
-      <Header onFreeConsultClick={handleFreeConsultClick} />
-
-      {/* Hero Header Space */}
-      <Hero 
-        onQuoteClick={handleFreeConsultClick} 
-        onExploreTemplatesClick={() => handleSelectNeed("Yêu cầu duyệt mẫu")} 
+      <Header 
+        activeTab={activeTab} 
+        setActiveTab={setActiveTab} 
+        onFreeConsultClick={handleFreeConsultClick} 
       />
 
-      {/* Services catalog categories */}
-      <Services onSelectService={handleSelectNeed} />
+      {/* Main Tab/Section Router Container */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeTab}
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -15 }}
+          transition={{ duration: 0.3 }}
+          className="w-full flex-1"
+        >
+          {activeTab === "home" && (
+            <>
+              {/* Hero Header Space */}
+              <Hero 
+                onQuoteClick={handleFreeConsultClick} 
+                onExploreTemplatesClick={() => handleSelectNeed("Yêu cầu duyệt mẫu")} 
+                homeContent={homeContent}
+              />
 
-      {/* Platforms specifications tabs */}
-      <Platforms />
+              {/* Quick Tab Category Portal Hub - Sleek Design */}
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 -mt-10 relative z-10">
+                <div className="glass-card rounded-3xl p-8 bg-slate-900/40 border border-white/5 shadow-2xl">
+                  <h3 className="font-display font-medium text-center text-sm uppercase tracking-widest text-[#94a3b8] mb-8">
+                    ⚡ KHÁM PHÁ THEO TỪNG CHUYÊN MỤC ⚡
+                  </h3>
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                    {[
+                      { id: "services", label: "Dịch Vụ Thiết Kế", desc: "WordPress, Shopify...", icon: "🎯" },
+                      { id: "benefits", label: "Lợi Ích Độc Bản", desc: "Tốc độ, Chuẩn SEO", icon: "✨" },
+                      { id: "process", label: "Quy Trình Thi Công", desc: "4 Bước Bàn Giao", icon: "⚡" },
+                      { id: "pricing", label: "Bảng Giá Gói Cước", desc: "Chỉ từ 2.9 Triệu", icon: "💎" },
+                      { id: "templates", label: "Kho Giao Diện", desc: "50+ Mẫu Đỉnh Cao", icon: "🖥️" },
+                    ].map((item) => (
+                      <button
+                        key={item.id}
+                        onClick={() => {
+                          setActiveTab(item.id);
+                          window.scrollTo({ top: 0, behavior: "smooth" });
+                        }}
+                        className="p-5 rounded-2xl bg-white/3 border border-white/5 hover:border-amber-500/50 hover:bg-slate-950 hover:scale-103 transition-all duration-300 text-center flex flex-col items-center justify-center group cursor-pointer"
+                      >
+                        <span className="text-2xl mb-2.5 group-hover:scale-110 transition-transform">{item.icon}</span>
+                        <span className="block text-xs sm:text-sm font-bold text-white mb-1">{item.label}</span>
+                        <span className="block text-[10px] text-slate-400 font-mono">{item.desc}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
 
-      {/* Grid of benefits */}
-      <Benefits />
+              {/* Strengths metrics tailored for non tech audience */}
+              <Strengths />
 
-      {/* Strengths metrics tailored for non tech audience */}
-      <Strengths />
+              {/* FAQs collapse accordion list */}
+              <FAQ />
+            </>
+          )}
 
-      {/* Stepper Process timeline */}
-      <Process />
+          {activeTab === "services" && (
+            <div className="pt-24">
+              {/* Services catalog categories */}
+              <Services onSelectService={handleSelectNeed} services={services} />
 
-      {/* Price matrix blocks */}
-      <Pricing onSelectPackage={handleSelectNeed} />
+              {/* Platforms specifications tabs */}
+              <Platforms />
+            </div>
+          )}
 
-      {/* Portfolio Templates filters grid */}
-      <Templates onSelectTemplate={handleSelectNeed} />
+          {activeTab === "benefits" && (
+            <div className="pt-24">
+              {/* Grid of benefits */}
+              <Benefits />
+            </div>
+          )}
 
-      {/* FAQs collapse accordion list */}
-      <FAQ />
+          {activeTab === "process" && (
+            <div className="pt-24">
+              {/* Stepper Process timeline */}
+              <Process />
+            </div>
+          )}
 
-      {/* Dynamic Client Form */}
-      <ContactForm 
-        prefilledNeed={prefilledNeed} 
-        onClearPrefill={() => setPrefilledNeed("")} 
-      />
+          {activeTab === "pricing" && (
+            <div className="pt-24">
+              {/* Price matrix blocks */}
+              <Pricing onSelectPackage={handleSelectNeed} pricing={pricing} />
+            </div>
+          )}
+
+          {activeTab === "templates" && (
+            <div className="pt-24">
+              {/* Portfolio Templates filters grid */}
+              <Templates onSelectTemplate={handleSelectNeed} templates={templates} />
+            </div>
+          )}
+
+          {activeTab === "contact" && (
+            <div className="pt-24">
+              {/* Dynamic Client Form */}
+              <ContactForm 
+                prefilledNeed={prefilledNeed} 
+                onClearPrefill={() => setPrefilledNeed("")} 
+                onSubmissionSuccess={reloadData}
+              />
+            </div>
+          )}
+        </motion.div>
+      </AnimatePresence>
 
       {/* Local Admin Database Access Button (For Demo & Verification) */}
-      <div className="py-6 bg-brand-dark/95 text-center border-t border-white/5 relative z-20">
-        <p className="text-xs text-slate-500 mb-2">
-          (Dành cho nhà phát triển & người trải nghiệm thử nghiệm form liên hệ)
+      <div className="py-8 bg-brand-dark/95 text-center border-t border-white/5 relative z-20">
+        <p className="text-xs text-slate-500 mb-3.5">
+          (Khu vực thử nghiệm và truy cập nhanh hệ thống bán hàng &amp; tư vấn)
         </p>
-        <button
-          onClick={() => {
-            fetchSubmissions();
-            setShowAdminPanel(true);
-          }}
-          className="inline-flex items-center gap-2 px-4.5 py-2 rounded-xl bg-slate-900 border border-white/10 hover:border-brand-purple/40 text-xs font-mono font-medium text-slate-400 hover:text-white transition-all cursor-pointer shadow-md"
-        >
-          <Inbox size={14} className="text-brand-purple" />
-          Hòm thư Admin: Quản lý Leads ({allSubmissions.length})
-        </button>
+        
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <button
+            onClick={() => {
+              fetchSubmissions();
+              setShowAdminPanel(true);
+            }}
+            className="inline-flex items-center gap-2 px-4.5 py-2.5 rounded-xl bg-slate-900 border border-white/10 hover:border-brand-purple/40 text-xs font-mono font-medium text-slate-400 hover:text-white transition-all cursor-pointer shadow-md"
+          >
+            <Inbox size={14} className="text-brand-purple" />
+            Hòm thư nhanh ({allSubmissions.length})
+          </button>
+
+          <button
+            onClick={() => navigateTo("/admin")}
+            className="inline-flex items-center gap-2 px-4.5 py-2.5 rounded-xl bg-gradient-to-tr from-[#06b6d4] to-[#8b5cf6] border border-white/10 text-slate-950 hover:text-white transition-all cursor-pointer shadow-md font-bold text-xs font-mono"
+          >
+            <Inbox size={14} />
+            Đến Trang Admin Quản Trị (/admin)
+          </button>
+        </div>
       </div>
 
       {/* Footer credits and local coordinates */}
-      <Footer onFreeConsultScroll={handleFreeConsultClick} />
+      <Footer 
+        onFreeConsultScroll={handleFreeConsultClick} 
+        contactSettings={contactSettings} 
+        footerCtaTitle={homeContent?.footerCtaTitle}
+      />
 
       {/* Ringing Hover Zalo / Phone floating icons */}
-      <FloatingWidgets />
+      <FloatingWidgets contactSettings={contactSettings} />
 
       {/* Submissions Inbox Admin Manager Drawer Modal */}
       <AnimatePresence>

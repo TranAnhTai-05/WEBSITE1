@@ -6,9 +6,10 @@ import { ContactSubmission } from "../types";
 interface ContactFormProps {
   prefilledNeed: string;
   onClearPrefill: () => void;
+  onSubmissionSuccess?: () => void;
 }
 
-export default function ContactForm({ prefilledNeed, onClearPrefill }: ContactFormProps) {
+export default function ContactForm({ prefilledNeed, onClearPrefill, onSubmissionSuccess }: ContactFormProps) {
   // Primary state form
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
@@ -109,6 +110,9 @@ export default function ContactForm({ prefilledNeed, onClearPrefill }: ContactFo
         const updatedList = [newSubmission, ...list];
         localStorage.setItem("wesign_contact_submissions", JSON.stringify(updatedList));
         setLocalSubmissions(updatedList);
+        if (onSubmissionSuccess) {
+          onSubmissionSuccess();
+        }
       } catch (e) {
         console.error("Failed to save submission", e);
       }

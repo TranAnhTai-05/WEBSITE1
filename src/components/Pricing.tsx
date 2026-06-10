@@ -1,12 +1,16 @@
 import { motion } from "motion/react";
 import { pricingTiers } from "../data";
-import { Check, Flame, MessageCircle, Calendar } from "lucide-react";
+import { Check, Flame, Calendar } from "lucide-react";
+import { PriceTier } from "../types";
 
 interface PricingProps {
   onSelectPackage: (packageName: string) => void;
+  pricing?: PriceTier[];
 }
 
-export default function Pricing({ onSelectPackage }: PricingProps) {
+export default function Pricing({ onSelectPackage, pricing }: PricingProps) {
+  const activePricing = pricing && pricing.length > 0 ? pricing : pricingTiers;
+
   return (
     <section id="pricing" className="py-24 relative bg-brand-dark overflow-hidden">
       {/* Background decoration blur glow elements */}
@@ -30,7 +34,7 @@ export default function Pricing({ onSelectPackage }: PricingProps) {
 
         {/* Pricing Cards Grid - 3 columns */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch max-w-6xl mx-auto">
-          {pricingTiers.map((tier) => {
+          {activePricing.map((tier) => {
             const isPopular = tier.isPopular;
             return (
               <motion.div
@@ -96,7 +100,7 @@ export default function Pricing({ onSelectPackage }: PricingProps) {
                     onClick={() => onSelectPackage(tier.name)}
                     className={`w-full py-3.5 px-4 rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-300 cursor-pointer ${
                       isPopular
-                        ? "bg-amber-500 hover:bg-amber-400 text-slate-950 glow-button"
+                        ? "bg-amber-500 hover:bg-amber-400 text-slate-950 glow-button animate-pulse"
                         : "bg-white/5 border border-white/10 text-slate-200 hover:text-white hover:bg-white/10"
                     }`}
                   >

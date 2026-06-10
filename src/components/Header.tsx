@@ -3,12 +3,13 @@ import { motion, AnimatePresence } from "motion/react";
 import { Menu, X, Sparkles } from "lucide-react";
 
 interface HeaderProps {
+  activeTab: string;
+  setActiveTab: (tab: string) => void;
   onFreeConsultClick: () => void;
 }
 
-export default function Header({ onFreeConsultClick }: HeaderProps) {
+export default function Header({ activeTab, setActiveTab, onFreeConsultClick }: HeaderProps) {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [activeSection, setActiveSection] = useState("home");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const menuItems = [
@@ -29,19 +30,6 @@ export default function Header({ onFreeConsultClick }: HeaderProps) {
       } else {
         setIsScrolled(false);
       }
-
-      // Active section highlight logic
-      const scrollPosition = window.scrollY + 120;
-      for (const item of menuItems) {
-        const element = document.getElementById(item.id);
-        if (element) {
-          const top = element.offsetTop;
-          const height = element.offsetHeight;
-          if (scrollPosition >= top && scrollPosition < top + height) {
-            setActiveSection(item.id);
-          }
-        }
-      }
     };
 
     window.addEventListener("scroll", handleScroll);
@@ -50,18 +38,11 @@ export default function Header({ onFreeConsultClick }: HeaderProps) {
 
   const handleNavClick = (id: string) => {
     setMobileMenuOpen(false);
-    const element = document.getElementById(id);
-    if (element) {
-      const headerOffset = 80;
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: "smooth"
-      });
-      setActiveSection(id);
-    }
+    setActiveTab(id);
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
   };
 
   return (
@@ -102,13 +83,13 @@ export default function Header({ onFreeConsultClick }: HeaderProps) {
                 key={item.id}
                 onClick={() => handleNavClick(item.id)}
                 className={`px-3.5 py-2 rounded-lg text-sm font-medium tracking-wide transition-all duration-200 relative ${
-                  activeSection === item.id
-                    ? "text-brand-cyan"
+                  activeTab === item.id
+                    ? "text-brand-cyan font-bold"
                     : "text-gray-300 hover:text-white"
                 }`}
               >
                 {item.label}
-                {activeSection === item.id && (
+                {activeTab === item.id && (
                   <motion.div
                     layoutId="activeIndicator"
                     className="absolute bottom-0 left-3 right-3 h-0.5 bg-gradient-to-r from-brand-cyan to-brand-purple"
@@ -156,7 +137,7 @@ export default function Header({ onFreeConsultClick }: HeaderProps) {
                   key={item.id}
                   onClick={() => handleNavClick(item.id)}
                   className={`block w-full text-left px-4 py-3 rounded-xl text-base font-medium transition-colors ${
-                    activeSection === item.id
+                    activeTab === item.id
                       ? "bg-brand-cyan/10 text-brand-cyan border-l-2 border-brand-cyan"
                       : "text-gray-300 hover:bg-white/5 hover:text-white"
                   }`}

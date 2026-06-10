@@ -4,6 +4,7 @@ export interface ServiceItem {
   description: string;
   iconName: string;
   badge?: string;
+  isActive?: boolean;
 }
 
 export interface PlatformItem {
@@ -44,6 +45,7 @@ export interface PriceTier {
   features: string[];
   isPopular: boolean;
   deliveryTime: string;
+  isActive?: boolean;
 }
 
 export interface TemplateItem {
@@ -55,6 +57,7 @@ export interface TemplateItem {
   features: string[];
   imageUrl: string;
   liveUrl?: string;
+  isActive?: boolean;
 }
 
 export interface FAQItem {
@@ -67,8 +70,36 @@ export interface ContactSubmission {
   id: string;
   fullName: string;
   phone: string;
+  email?: string;
   needs: string;
   notes?: string;
   createdAt: string;
-  status: "pending" | "contacted" | "completed";
+  status: "pending" | "contacted" | "consulting" | "completed" | "unsuitable";
+  adminNotes?: string;
+}
+
+export interface HomeContent {
+  heroTitle: string;
+  heroSubtitle: string;
+  heroPrimaryCta: string;
+  heroSecondaryCta: string;
+  servicesTitle: string;
+  benefitsTitle: string;
+  processTitle: string;
+  pricingTitle: string;
+  faqTitle: string;
+  footerCtaTitle: string;
+}
+
+export interface ContactSettings {
+  brandName: string;
+  hotline: string;
+  zalo: string;
+  email: string;
+  address: string;
+  facebook: string;
+  fanpage: string;
+  tiktok: string;
+  googleMaps: string;
+  footerText: string;
 }

@@ -1,14 +1,27 @@
 import { motion } from "motion/react";
 import { Phone, MessageCircle } from "lucide-react";
+import { ContactSettings } from "../types";
 
-export default function FloatingWidgets() {
+interface FloatingWidgetsProps {
+  contactSettings?: ContactSettings | null;
+}
+
+export default function FloatingWidgets({ contactSettings }: FloatingWidgetsProps) {
+  const hotlineValue = contactSettings?.hotline || "0982555312";
+  const zaloValue = contactSettings?.zalo || "0982555312";
+
   const triggerPhoneDial = () => {
-    window.location.href = "tel:0982555312";
+    window.location.href = `tel:${hotlineValue.replace(/\./g, "").replace(/\s/g, "")}`;
   };
 
   const triggerZaloChat = () => {
-    window.open("https://zalo.me/0982555312", "_blank", "referrer");
+    const sanitizedZalo = zaloValue.replace(/\./g, "").replace(/\s/g, "");
+    const link = zaloValue.startsWith("http") ? zaloValue : `https://zalo.me/${sanitizedZalo}`;
+    window.open(link, "_blank", "referrer");
   };
+
+  // Format hotline strictly for display (e.g. "0982.555.312")
+  const formattedHotline = hotlineValue;
 
   return (
     <div className="fixed bottom-6 right-6 z-40 flex flex-col gap-3.5 pointer-events-none">
@@ -16,7 +29,7 @@ export default function FloatingWidgets() {
       {/* Phone call ringing widget */}
       <div className="flex items-center gap-2.5 justify-end pointer-events-auto">
         <span className="hidden sm:inline-block px-3 py-1.5 rounded-lg bg-black/80 border border-white/10 text-[11px] font-semibold text-white tracking-wide shadow-md backdrop-blur-xs select-none">
-          Gọi điện ngay: 0982.xxx.312
+          Gọi điện ngay: {formattedHotline}
         </span>
         <button
           onClick={triggerPhoneDial}

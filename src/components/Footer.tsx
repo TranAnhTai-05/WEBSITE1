@@ -1,16 +1,29 @@
 import { Phone, MessageCircle, Mail, MapPin, Sparkles, Facebook, ArrowUp } from "lucide-react";
+import { ContactSettings } from "../types";
 
 interface FooterProps {
   onFreeConsultScroll: () => void;
+  contactSettings?: ContactSettings | null;
+  footerCtaTitle?: string;
 }
 
-export default function Footer({ onFreeConsultScroll }: FooterProps) {
+export default function Footer({ onFreeConsultScroll, contactSettings, footerCtaTitle }: FooterProps) {
+  const hotlineValue = contactSettings?.hotline || "0982555312";
+  const zaloValue = contactSettings?.zalo || "0982555312";
+  const emailValue = contactSettings?.email || "contact@wesign.vn";
+  const addressValue = contactSettings?.address || "Phân khu Origami, Vinhomes Grand Park, Thủ Đức, Thành phố Hồ Chí Minh";
+  const brandNameValue = contactSettings?.brandName || "WESIGN STUDIO";
+  const footerTextValue = contactSettings?.footerText || "Chuyên thiết kế website cho cá nhân, cửa hàng, trung tâm đào tạo, spa, nhà hàng và doanh nghiệp nhỏ. Đảm bảm các tiêu chí thẩm mỹ tối tân, tốc độ vượt trội và chuẩn chỉnh trên smartphone.";
+  const ctaTitleValue = footerCtaTitle || "Bạn đang cần một website cho công việc kinh doanh?";
+
   const triggerZalo = () => {
-    window.open("https://zalo.me/0982555312", "_blank", "referrer");
+    const sanitizedZalo = zaloValue.replace(/\./g, "").replace(/\s/g, "");
+    const link = zaloValue.startsWith("http") ? zaloValue : `https://zalo.me/${sanitizedZalo}`;
+    window.open(link, "_blank", "referrer");
   };
 
   const triggerCall = () => {
-    window.location.href = "tel:0982555312";
+    window.location.href = `tel:${hotlineValue.replace(/\./g, "").replace(/\s/g, "")}`;
   };
 
   const scrollToTop = () => {
@@ -33,7 +46,7 @@ export default function Footer({ onFreeConsultScroll }: FooterProps) {
             </span>
             
             <h2 className="text-2.5xl sm:text-4xl font-display font-bold text-white tracking-tight leading-tight">
-              Bạn đang cần một website cho công việc kinh doanh?
+              {ctaTitleValue}
             </h2>
             
             <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
@@ -73,16 +86,16 @@ export default function Footer({ onFreeConsultScroll }: FooterProps) {
                 </div>
               </div>
               <span className="font-display font-extrabold text-white tracking-widest uppercase">
-                WESIGN STUDIO
+                {brandNameValue}
               </span>
             </div>
 
             <p className="leading-relaxed text-slate-400 max-w-sm">
-              Chuyên thiết kế website cho cá nhân, cửa hàng, trung tâm đào tạo, spa, nhà hàng và doanh nghiệp nhỏ. Đảm bảm các tiêu chí thẩm mỹ tối tân, tốc độ vượt trội và chuẩn chỉnh trên smartphone.
+              {footerTextValue}
             </p>
 
             <p className="text-xs text-slate-500">
-              © 2026 Wesign Studio. Quyền sở hữu trí tuệ và bảo hộ thương hiệu toàn cầu.
+              © {new Date().getFullYear()} {brandNameValue}. Quyền sở hữu trí tuệ và bảo hộ thương hiệu toàn cầu.
             </p>
           </div>
 
@@ -110,7 +123,7 @@ export default function Footer({ onFreeConsultScroll }: FooterProps) {
                 <Phone size={14} className="text-brand-cyan shrink-0 mt-0.5" />
                 <div>
                   <span className="block text-[11px] font-mono text-slate-500 uppercase leading-none mb-1">Hotline / Zalo:</span>
-                  <a href="tel:0982555312" className="text-white font-semibold hover:text-brand-cyan">0982.555.312</a>
+                  <a href={`tel:${hotlineValue}`} className="text-white font-semibold hover:text-brand-cyan">{hotlineValue}</a>
                 </div>
               </li>
 
@@ -118,7 +131,7 @@ export default function Footer({ onFreeConsultScroll }: FooterProps) {
                 <Mail size={14} className="text-brand-purple shrink-0 mt-0.5" />
                 <div>
                   <span className="block text-[11px] font-mono text-slate-500 uppercase leading-none mb-1">Thư điện tử:</span>
-                  <a href="mailto:contact@wesign.vn" className="text-slate-300 font-medium hover:text-brand-purple">contact@wesign.vn</a>
+                  <a href={`mailto:${emailValue}`} className="text-slate-300 font-medium hover:text-brand-purple">{emailValue}</a>
                 </div>
               </li>
 
@@ -126,7 +139,7 @@ export default function Footer({ onFreeConsultScroll }: FooterProps) {
                 <MapPin size={14} className="text-brand-cyan shrink-0 mt-0.5" />
                 <div>
                   <span className="block text-[11px] font-mono text-slate-500 uppercase leading-none mb-1">Trụ sở làm việc:</span>
-                  <span className="text-slate-300">Phân khu Origami, Vinhomes Grand Park, Thủ Đức, Thành phố Hồ Chí Minh</span>
+                  <span className="text-slate-300">{addressValue}</span>
                 </div>
               </li>
             </ul>
